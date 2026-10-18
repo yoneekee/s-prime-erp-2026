@@ -1,0 +1,340 @@
+import { useState, useCallback } from "react";
+import { format, parse } from "date-fns";
+import ERPLayout from "@/components/erp/ERPLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Search, FileDown, FileText, TrendingUp, TrendingDown, Loader2 } from "lucide-react";
+import { usePdfDownload } from "@/hooks/use-pdf-download";
+import { pdf } from "@react-pdf/renderer";
+import { FinancialStatementPdf } from "@/components/pdf";
+import type { FinancialPdfData } from "@/components/pdf";
+import { toast } from "sonner";
+import { getFiscalYearPeriod } from "@/lib/format-utils";
+
+// B/S mock data
+const bsAssets = [
+  { code: "1101", name: "原材料", amount: 128500000, ratio: 18.2 },
+  { code: "1102", name: "半製品（仕掛品）", amount: 95200000, ratio: 13.5 },
+  { code: "1103", name: "製品（完成品）", amount: 312000000, ratio: 44.2 },
+  { code: "1104", name: "未着品", amount: 45600000, ratio: 6.5 },
+  { code: "1105", name: "積送品", amount: 78300000, ratio: 11.1 },
+  { code: "1106", name: "売掛金", amount: 46200000, ratio: 6.5 },
+];
+
+const bsLiabilities = [
+  { code: "2101", name: "買掛金", amount: 89400000, ratio: 62.3 },
+  { code: "2102", name: "未払金", amount: 54100000, ratio: 37.7 },
+];
+
+// P/L mock data
+const plRevenue = [
+  { code: "4101", name: "売上高", amount: 542000000, ratio: 100.0 },
+];
+
+const plExpenses = [
+  { code: "5101", name: "売上原価", amount: 378500000, ratio: 69.8 },
+  { code: "5102", name: "棚卸減耗損", amount: 4200000, ratio: 0.8 },
+];
+
+const FinancialStatements = () => {
+  const [reportType, setReportType] = useState<"bs" | "pl">("bs");
+  const [startDate, setStartDate] = useState(() => getFiscalYearPeriod().startDate);
+  const [endDate, setEndDate] = useState(() => getFiscalYearPeriod().endDate);
+const [isQueried, setIsQueried] = useState(true);
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+
+  const assetTotal = bsAssets.reduce((s, a) => s + a.amount, 0);
+  const liabilityTotal = bsLiabilities.reduce((s, a) => s + a.amount, 0);
+  const equityTotal = assetTotal - liabilityTotal;
+  const revenueTotal = plRevenue.reduce((s, a) => s + a.amount, 0);
+  const expenseTotal = plExpenses.reduce((s, a) => s + a.amount, 0);
+  const netIncome = revenueTotal - expenseTotal;
+
+  const handlePdfDownload = useCallback(async () => {
+    setIsPdfGenerating(true);
+    try {
+      const pdfData: FinancialPdfData = reportType === "bs"
+        ? {
+            reportType: "bs",
+            title: "貸 借 対 照 表",
+            period: `${startDate} ~ ${endDate}`,
+            sections: [
+              { title: "【資産の部】", items: bsAssets, subtotalLabel: "資産合計", subtotalAmount: assetTotal },
+              { title: "【負債の部】", items: bsLiabilities, subtotalLabel: "負債合計", subtotalAmount: liabilityTotal },
+            ],
+            grandTotalLabel: "純資産合計（資産 − 負債）",
+            grandTotalAmount: equityTotal,
+          }
+        : {
+            reportType: "pl",
+            title: "損 益 計 算 書",
+            period: `${startDate} ~ ${endDate}`,
+            sections: [
+              { title: "【収益の部】", items: plRevenue, subtotalLabel: "収益合計", subtotalAmount: revenueTotal },
+              { title: "【費用の部】", items: plExpenses, subtotalLabel: "費用合計", subtotalAmount: expenseTotal },
+            ],
+            grandTotalLabel: "当期純利益（収益 − 費用）",
+            grandTotalAmount: netIncome,
+          };
+
+      const blob = await pdf(<FinancialStatementPdf data={pdfData} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${reportType === "bs" ? "BS" : "PL"}_${startDate}_${endDate}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("PDFをダウンロードしました");
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      toast.error("PDF生成に失敗しました");
+    } finally {
+      setIsPdfGenerating(false);
+    }
+  }, [reportType, startDate, endDate, assetTotal, liabilityTotal, equityTotal, revenueTotal, expenseTotal, netIncome]);
+
+  const renderAccountRow = (item: { code: string; name: string; amount: number; ratio: number }, idx: number) => (
+    <TableRow key={item.code} className="border-border hover:bg-secondary/50">
+      <TableCell className="px-3 py-2 text-xs font-mono text-muted-foreground">{item.code}</TableCell>
+      <TableCell className="px-3 py-2 text-xs text-foreground">{item.name}</TableCell>
+      <TableCell className="px-3 py-2 text-xs text-right font-mono text-foreground">¥{item.amount.toLocaleString()}</TableCell>
+      <TableCell className="px-3 py-2 text-xs text-right font-mono text-muted-foreground">{item.ratio.toFixed(1)}%</TableCell>
+    </TableRow>
+  );
+
+  const renderSummaryRow = (label: string, amount: number, highlight?: boolean) => (
+    <TableRow className="border-border bg-muted/30 hover:bg-muted/40">
+      <TableCell className="px-3 py-2" />
+      <TableCell className={`px-3 py-2 text-xs font-bold ${highlight ? "text-primary" : "text-foreground"}`}>{label}</TableCell>
+      <TableCell className={`px-3 py-2 text-xs text-right font-mono font-bold ${highlight ? "text-primary" : "text-foreground"}`}>¥{amount.toLocaleString()}</TableCell>
+      <TableCell className="px-3 py-2 text-xs text-right font-mono text-muted-foreground">100.0%</TableCell>
+    </TableRow>
+  );
+
+  return (
+    <ERPLayout>
+      <div className="space-y-4">
+        {/* Page Header */}
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-lg font-bold text-foreground">財務諸表照会</h1>
+            <Badge variant="outline">デモ表示</Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            貸借対照表（B/S）および損益計算書（P/L）を照会し、PDFで出力します
+          </p>
+        </div>
+
+        {/* Search & Action */}
+        <Card className="border-border bg-card">
+          <CardContent className="px-4 py-4">
+            <div className="flex flex-wrap items-end gap-4">
+              {/* Date Range */}
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">照会期間</label>
+                <div className="flex items-center gap-2">
+                  <DatePicker
+                    value={startDate}
+                    onChange={(d) => setStartDate(d ? format(d, "yyyy-MM-dd") : "")}
+                    className="w-36"
+                  />
+                  <span className="text-xs text-muted-foreground">~</span>
+                  <DatePicker
+                    value={endDate}
+                    onChange={(d) => setEndDate(d ? format(d, "yyyy-MM-dd") : "")}
+                    className="w-36"
+                  />
+                </div>
+                <p className="text-xs text-info">サンプルデータのため、照会期間による金額の変動はありません。</p>
+              </div>
+
+              {/* Report Type */}
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">帳票種別</label>
+                <RadioGroup
+                  value={reportType}
+                  onValueChange={(v) => setReportType(v as "bs" | "pl")}
+                  className="flex gap-4"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <RadioGroupItem value="bs" id="bs" />
+                    <Label htmlFor="bs" className="text-xs cursor-pointer">貸借対照表（B/S）</Label>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <RadioGroupItem value="pl" id="pl" />
+                    <Label htmlFor="pl" className="text-xs cursor-pointer">損益計算書（P/L）</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <div className="flex gap-2 ml-auto">
+                <Button size="sm" className="gap-1.5 text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setIsQueried(true)}>
+                  <Search className="w-3.5 h-3.5" /> 照会
+                </Button>
+                <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={handlePdfDownload} disabled={isPdfGenerating || !isQueried}>
+                  {isPdfGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />} PDF出力
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {isQueried && (
+          <>
+            {/* Summary Cards */}
+            {reportType === "bs" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <Card className="border-border bg-card">
+                  <CardContent className="px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">資産合計</div>
+                    <div className="text-lg font-mono font-bold text-primary">¥{assetTotal.toLocaleString()}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border bg-card">
+                  <CardContent className="px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">負債合計</div>
+                    <div className="text-lg font-mono font-bold text-destructive">¥{liabilityTotal.toLocaleString()}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border bg-card">
+                  <CardContent className="px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">純資産（資本）</div>
+                    <div className="text-lg font-mono font-bold text-success flex items-center gap-1.5">
+                      ¥{equityTotal.toLocaleString()}
+                      <TrendingUp className="w-4 h-4" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <Card className="border-border bg-card">
+                  <CardContent className="px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">売上合計</div>
+                    <div className="text-lg font-mono font-bold text-primary">¥{revenueTotal.toLocaleString()}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border bg-card">
+                  <CardContent className="px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">費用合計</div>
+                    <div className="text-lg font-mono font-bold text-destructive">¥{expenseTotal.toLocaleString()}</div>
+                  </CardContent>
+                </Card>
+                <Card className="border-border bg-card">
+                  <CardContent className="px-4 py-3">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">当期純利益</div>
+                    <div className={`text-lg font-mono font-bold flex items-center gap-1.5 ${netIncome >= 0 ? "text-success" : "text-destructive"}`}>
+                      ¥{netIncome.toLocaleString()}
+                      {netIncome >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Financial Table */}
+            <Card className="border-border bg-card">
+              <CardHeader className="py-3 px-4">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  {reportType === "bs" ? "貸借対照表（B/S）" : "損益計算書（P/L）"}
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-2 text-muted-foreground">
+                    {startDate} ~ {endDate}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-0 pb-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent border-border">
+                      <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground h-8 px-3 w-20">コード</TableHead>
+                      <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground h-8 px-3">勘定科目</TableHead>
+                      <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground h-8 px-3 text-right">金額（JPY）</TableHead>
+                      <TableHead className="text-[10px] uppercase tracking-wider text-muted-foreground h-8 px-3 text-right w-24">構成比（%）</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reportType === "bs" ? (
+                      <>
+                        {/* Assets Section */}
+                        <TableRow className="border-border bg-primary/5 hover:bg-primary/10">
+                          <TableCell colSpan={4} className="px-3 py-1.5 text-xs font-bold text-primary">
+                           【資産の部】
+                          </TableCell>
+                        </TableRow>
+                        {bsAssets.map(renderAccountRow)}
+                        {renderSummaryRow("資産合計", assetTotal, true)}
+
+                        {/* Liabilities Section */}
+                        <TableRow className="border-border bg-destructive/5 hover:bg-destructive/10">
+                          <TableCell colSpan={4} className="px-3 py-1.5 text-xs font-bold text-destructive">
+                            【負債の部】
+                          </TableCell>
+                        </TableRow>
+                        {bsLiabilities.map(renderAccountRow)}
+                        {renderSummaryRow("負債合計", liabilityTotal)}
+
+                        {/* Equity */}
+                        <TableRow className="border-border bg-success/5 hover:bg-success/10">
+                          <TableCell colSpan={4} className="px-3 py-1.5 text-xs font-bold text-success">
+                            【純資産の部】
+                          </TableCell>
+                        </TableRow>
+                        {renderSummaryRow("純資産合計（資産 − 負債）", equityTotal, true)}
+                      </>
+                    ) : (
+                      <>
+                        {/* Revenue */}
+                        <TableRow className="border-border bg-primary/5 hover:bg-primary/10">
+                          <TableCell colSpan={4} className="px-3 py-1.5 text-xs font-bold text-primary">
+                            【収益の部】
+                          </TableCell>
+                        </TableRow>
+                        {plRevenue.map(renderAccountRow)}
+                        {renderSummaryRow("収益合計", revenueTotal, true)}
+
+                        {/* Expenses */}
+                        <TableRow className="border-border bg-destructive/5 hover:bg-destructive/10">
+                          <TableCell colSpan={4} className="px-3 py-1.5 text-xs font-bold text-destructive">
+                            【費用の部】
+                          </TableCell>
+                        </TableRow>
+                        {plExpenses.map(renderAccountRow)}
+                        {renderSummaryRow("費用合計", expenseTotal)}
+
+                        {/* Net Income */}
+                        <TableRow className="border-border bg-success/5 hover:bg-success/10">
+                          <TableCell colSpan={4} className="px-3 py-1.5 text-xs font-bold text-success">
+                            【当期純利益】
+                          </TableCell>
+                        </TableRow>
+                        {renderSummaryRow("当期純利益（収益 − 費用）", netIncome, true)}
+                      </>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+    </ERPLayout>
+  );
+};
+
+export default FinancialStatements;
