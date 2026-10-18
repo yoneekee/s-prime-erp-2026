@@ -29,6 +29,7 @@ import {
   BarChart3,
   Building2,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import {
   Accordion,
@@ -1178,13 +1179,41 @@ const CompanyIntro = () => {
               className="self-start sm:self-auto flex-shrink-0"
             >
               <a
-                href="https://dev-showcase-kim.netlify.app"
+                href="https://merry-sherbet-26f1bd.netlify.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="開発者紹介サイト（新しいタブで開きます）"
               >
                 <ExternalLink />
                 開発者紹介サイトを見る
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* System Proposal (PDF download) */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold">
+              業務システム導入企画提案書
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              半導体・精密機器製造業向けに、購買・生産・在庫・出庫・会計連携の導入構想と段階的な導入方針をまとめた提案書です。要件・費用・導入時期は未確定の基本構想資料として、A4判のPDFでご覧いただけます。
+            </p>
+            <Button
+              asChild
+              size="sm"
+              className="self-start sm:self-auto flex-shrink-0"
+            >
+              <a
+                href="/downloads/S-PRIME_ERP_kikakusho.pdf"
+                download="S-PRIME_ERP_企画書.pdf"
+                aria-label="S-PRIME ERP 企画書（PDF）をダウンロードします"
+              >
+                <Download />
+                企画書をPDFでダウンロード
               </a>
             </Button>
           </CardContent>
@@ -1770,7 +1799,7 @@ const CompanyIntro = () => {
               ·
             </span>
             <a
-              href="https://dev-showcase-kim.netlify.app"
+              href="https://merry-sherbet-26f1bd.netlify.app"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="開発者紹介サイト（新しいタブで開きます）"
