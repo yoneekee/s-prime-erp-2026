@@ -248,8 +248,16 @@ const techStack = [
     label: "Backend（今後の拡張）",
     value: "C# (.NET Core), Entity Framework Core",
   },
-  { icon: Database, label: "Database（今後の拡張）", value: "PostgreSQL (Read Committed)" },
-  { icon: CloudCog, label: "Infrastructure（今後の拡張）", value: "Azure Cloud Services" },
+  {
+    icon: Database,
+    label: "Database（今後の拡張）",
+    value: "PostgreSQL (Read Committed)",
+  },
+  {
+    icon: CloudCog,
+    label: "Infrastructure（今後の拡張）",
+    value: "Azure Cloud Services",
+  },
 ];
 
 interface TableColumn {
@@ -1170,7 +1178,7 @@ const CompanyIntro = () => {
               className="self-start sm:self-auto flex-shrink-0"
             >
               <a
-                href="https://merry-sherbet-26f1bd.netlify.app"
+                href="https://dev-showcase-kim.netlify.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="開発者紹介サイト（新しいタブで開きます）"
@@ -1324,7 +1332,9 @@ const CompanyIntro = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground space-y-1.5 pl-8">
-                  <p className="leading-relaxed">申請者が購買依頼を起票・申請すると、一次承認者・最終承認者の2段階で承認されます。承認後は購買担当が見積・発注を行い、入荷のたびに数量とLOT番号を分納入庫として記録します。全数量がそろうと入庫完了となり、検収担当の検収をもって完了します。</p>
+                  <p className="leading-relaxed">
+                    申請者が購買依頼を起票・申請すると、一次承認者・最終承認者の2段階で承認されます。承認後は購買担当が見積・発注を行い、入荷のたびに数量とLOT番号を分納入庫として記録します。全数量がそろうと入庫完了となり、検収担当の検収をもって完了します。
+                  </p>
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="step2">
@@ -1337,7 +1347,9 @@ const CompanyIntro = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground space-y-1.5 pl-8">
-                  <p className="leading-relaxed">承認後、発注確定までに内容の見直しが必要な場合、購買担当は理由を添えて差し戻せます。起票者は同じ伝票番号のまま内容を修正して再申請でき、それまでの履歴はすべて残ります。一方、承認者による否認は最終判断のため、その伝票は再申請できません。</p>
+                  <p className="leading-relaxed">
+                    承認後、発注確定までに内容の見直しが必要な場合、購買担当は理由を添えて差し戻せます。起票者は同じ伝票番号のまま内容を修正して再申請でき、それまでの履歴はすべて残ります。一方、承認者による否認は最終判断のため、その伝票は再申請できません。
+                  </p>
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="step3">
@@ -1350,7 +1362,9 @@ const CompanyIntro = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground space-y-1.5 pl-8">
-                  <p className="leading-relaxed">出庫依頼も同じ2段階承認を経て、出庫担当が配送開始（LOT番号を記録）、出庫完了、売上確定まで処理します。承認後に問題があれば出庫担当が差し戻し、起票者が修正して再申請します。</p>
+                  <p className="leading-relaxed">
+                    出庫依頼も同じ2段階承認を経て、出庫担当が配送開始（LOT番号を記録）、出庫完了、売上確定まで処理します。承認後に問題があれば出庫担当が差し戻し、起票者が修正して再申請します。
+                  </p>
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="step4">
@@ -1363,26 +1377,94 @@ const CompanyIntro = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground pl-8">
-                  <p className="leading-relaxed">画面上部の「デモ用ロール切替」で操作者を切り替えると、申請から検収・売上確定までの全工程を一人で体験できます。ダッシュボードには、現在のロールで対応が必要な伝票が表示されます。</p>
-                
+                  <p className="leading-relaxed">
+                    画面上部の「デモ用ロール切替」で操作者を切り替えると、申請から検収・売上確定までの全工程を一人で体験できます。ダッシュボードには、現在のロールで対応が必要な伝票が表示されます。
+                  </p>
+
                   <div className="overflow-x-auto mt-4 rounded-lg border border-border">
                     <Table>
-                      <TableHeader><TableRow className="bg-secondary/50">
-                        <TableHead className="text-xs whitespace-nowrap">ロール</TableHead>
-                        <TableHead className="text-xs whitespace-nowrap">担当者</TableHead>
-                        <TableHead className="text-xs">主な操作</TableHead>
-                      </TableRow></TableHeader>
+                      <TableHeader>
+                        <TableRow className="bg-secondary/50">
+                          <TableHead className="text-xs whitespace-nowrap">
+                            ロール
+                          </TableHead>
+                          <TableHead className="text-xs whitespace-nowrap">
+                            担当者
+                          </TableHead>
+                          <TableHead className="text-xs">主な操作</TableHead>
+                        </TableRow>
+                      </TableHeader>
                       <TableBody>
-                        <TableRow><TableCell className="text-xs whitespace-nowrap">申請者</TableCell><TableCell className="text-xs whitespace-nowrap">キム ヨンジョン</TableCell><TableCell className="text-xs">購買・出庫依頼の起票と申請、差戻し後の修正・再申請</TableCell></TableRow>
-                        <TableRow><TableCell className="text-xs whitespace-nowrap">一次承認者</TableCell><TableCell className="text-xs whitespace-nowrap">鈴木 花子</TableCell><TableCell className="text-xs">一次承認・否認</TableCell></TableRow>
-                        <TableRow><TableCell className="text-xs whitespace-nowrap">最終承認者</TableCell><TableCell className="text-xs whitespace-nowrap">佐藤 健一</TableCell><TableCell className="text-xs">最終承認・否認</TableCell></TableRow>
-                        <TableRow><TableCell className="text-xs whitespace-nowrap">購買担当</TableCell><TableCell className="text-xs whitespace-nowrap">山田 裕子</TableCell><TableCell className="text-xs">見積、発注、分納入庫、入庫完了、差戻し</TableCell></TableRow>
-                        <TableRow><TableCell className="text-xs whitespace-nowrap">検収担当</TableCell><TableCell className="text-xs whitespace-nowrap">渡辺 涼介</TableCell><TableCell className="text-xs">検収</TableCell></TableRow>
-                        <TableRow><TableCell className="text-xs whitespace-nowrap">出庫担当</TableCell><TableCell className="text-xs whitespace-nowrap">伊藤 真一</TableCell><TableCell className="text-xs">配送開始、出庫完了、売上確定、差戻し</TableCell></TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            申請者
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            キム ヨンジョン
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            購買・出庫依頼の起票と申請、差戻し後の修正・再申請
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            一次承認者
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            鈴木 花子
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            一次承認・否認
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            最終承認者
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            佐藤 健一
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            最終承認・否認
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            購買担当
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            山田 裕子
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            見積、発注、分納入庫、入庫完了、差戻し
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            検収担当
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            渡辺 涼介
+                          </TableCell>
+                          <TableCell className="text-xs">検収</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            出庫担当
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            伊藤 真一
+                          </TableCell>
+                          <TableCell className="text-xs">
+                            配送開始、出庫完了、売上確定、差戻し
+                          </TableCell>
+                        </TableRow>
                       </TableBody>
                     </Table>
                   </div>
-                  <p className="mt-3 leading-relaxed">デモ用ロールは業務の流れを体験するためのもので、本番の認証・権限管理とは異なります。</p>
+                  <p className="mt-3 leading-relaxed">
+                    デモ用ロールは業務の流れを体験するためのもので、本番の認証・権限管理とは異なります。
+                  </p>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -1454,7 +1536,9 @@ const CompanyIntro = () => {
         {/* Account Codes */}
         <Card>
           <CardHeader className="pb-3">
-            <SectionTitle icon={FileText}>会計勘定科目（今後の拡張）</SectionTitle>
+            <SectionTitle icon={FileText}>
+              会計勘定科目（今後の拡張）
+            </SectionTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto rounded-lg border border-border">
@@ -1645,8 +1729,12 @@ const CompanyIntro = () => {
                   <div>
                     <p className="text-xs font-semibold text-foreground">
                       {screen.title}
-                      {["財務諸表", "BOM生産伝票", "請求書・発注書"].includes(screen.title) && (
-                        <Badge variant="outline" className="ml-2 text-[10px]">デモ表示</Badge>
+                      {["財務諸表", "BOM生産伝票", "請求書・発注書"].includes(
+                        screen.title,
+                      ) && (
+                        <Badge variant="outline" className="ml-2 text-[10px]">
+                          デモ表示
+                        </Badge>
                       )}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
@@ -1676,12 +1764,13 @@ const CompanyIntro = () => {
         {/* Footer */}
         <div className="text-center py-6">
           <p className="text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} S-Prime Corp. — 半導体精密機器製造および統合在庫管理システム
+            © {new Date().getFullYear()} S-Prime Corp. —
+            半導体精密機器製造および統合在庫管理システム
             <span aria-hidden="true" className="mx-1.5">
               ·
             </span>
             <a
-              href="https://merry-sherbet-26f1bd.netlify.app"
+              href="https://dev-showcase-kim.netlify.app"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="開発者紹介サイト（新しいタブで開きます）"
@@ -1698,7 +1787,10 @@ const CompanyIntro = () => {
         open={!!selectedTable}
         onOpenChange={(open) => !open && setSelectedTable(null)}
       >
-        <DialogContent aria-describedby={undefined} className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent
+          aria-describedby={undefined}
+          className="sm:max-w-2xl max-h-[80vh] overflow-y-auto"
+        >
           <DialogHeader>
             <DialogTitle className="text-sm font-mono flex items-center gap-2">
               <Database className="w-4 h-4 text-primary" />
