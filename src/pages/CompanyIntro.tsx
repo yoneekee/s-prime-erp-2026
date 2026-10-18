@@ -1179,7 +1179,7 @@ const CompanyIntro = () => {
               className="self-start sm:self-auto flex-shrink-0"
             >
               <a
-                href="https://merry-sherbet-26f1bd.netlify.app"
+                href="https://dev-showcase-kim.netlify.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="開発者紹介サイト（新しいタブで開きます）"
@@ -1799,7 +1799,7 @@ const CompanyIntro = () => {
               ·
             </span>
             <a
-              href="https://merry-sherbet-26f1bd.netlify.app"
+              href="https://dev-showcase-kim.netlify.app"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="開発者紹介サイト（新しいタブで開きます）"
