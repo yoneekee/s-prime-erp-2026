@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ERPLayout from "@/components/erp/ERPLayout";
+import ApiDesignDoc from "@/components/erp/ApiDesignDoc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1562,6 +1563,112 @@ const CompanyIntro = () => {
           </CardContent>
         </Card>
 
+        {/* Screen Definitions */}
+        <Card>
+          <CardHeader className="pb-3">
+            <SectionTitle icon={BookOpen}>画面定義</SectionTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                {
+                  id: "8.0",
+                  title: "全体ダッシュボード",
+                  desc: "承認待ちや購買・出庫の進行状況、未処理タスク、安全在庫割れを確認",
+                  path: "/",
+                },
+                {
+                  id: "8.1",
+                  title: "伝票一覧",
+                  desc: "購買・出庫に関する全伝票を横断的に検索・照会",
+                  path: "/production/slips",
+                },
+                {
+                  id: "8.2",
+                  title: "原材料・半製品購買",
+                  desc: "購買依頼から分納入庫・検収までの進行状況と履歴を管理",
+                  path: "/production/execution",
+                },
+                {
+                  id: "8.3",
+                  title: "出庫管理",
+                  desc: "製品の出庫依頼から売上確定までを管理",
+                  path: "/production/shipping",
+                },
+                {
+                  id: "8.4",
+                  title: "財務諸表",
+                  desc: "B/S、P/L照会およびPDF出力",
+                  path: "/documents/finance",
+                },
+                {
+                  id: "8.5",
+                  title: "BOM生産伝票",
+                  desc: "部品構成と必要数量をサンプルデータで確認",
+                  path: "/documents/bom",
+                },
+                {
+                  id: "8.6",
+                  title: "請求書・発注書",
+                  desc: "発注書（PO）、請求書（Invoice）照会およびPDF出力",
+                  path: "/documents/invoice",
+                },
+                {
+                  id: "8.7",
+                  title: "社員マスタ",
+                  desc: "社員の登録・修正・削除と職務区分の管理",
+                  path: "/master/employee",
+                },
+                {
+                  id: "8.8",
+                  title: "品目マスタ",
+                  desc: "原材料/半製品/完成品の登録・修正・削除",
+                  path: "/master/item",
+                },
+                {
+                  id: "8.9",
+                  title: "倉庫拠点マスタ",
+                  desc: "倉庫、拠点の登録・修正・削除",
+                  path: "/master/warehouse",
+                },
+              ].map((screen) => (
+                <div
+                  key={screen.id}
+                  onClick={() =>
+                    setNavigateTarget({
+                      title: screen.title,
+                      path: screen.path,
+                    })
+                  }
+                  className="flex items-start gap-3 p-3 rounded-lg border border-border/50 bg-secondary/30 hover:bg-primary/10 hover:border-primary/30 transition-colors cursor-pointer"
+                >
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] font-mono mt-0.5 flex-shrink-0"
+                  >
+                    {screen.id}
+                  </Badge>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">
+                      {screen.title}
+                      {["財務諸表", "BOM生産伝票", "請求書・発注書"].includes(
+                        screen.title,
+                      ) && (
+                        <Badge variant="outline" className="ml-2 text-[10px]">
+                          デモ表示
+                        </Badge>
+                      )}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {screen.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Account Codes */}
         <Card>
           <CardHeader className="pb-3">
@@ -1670,109 +1777,18 @@ const CompanyIntro = () => {
           </CardContent>
         </Card>
 
-        {/* Screen Definitions */}
+        {/* API Design */}
         <Card>
           <CardHeader className="pb-3">
-            <SectionTitle icon={BookOpen}>画面定義</SectionTitle>
+            <SectionTitle icon={Server}>API設計（今後の拡張）</SectionTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                {
-                  id: "8.0",
-                  title: "全体ダッシュボード",
-                  desc: "承認待ちや購買・出庫の進行状況、未処理タスク、安全在庫割れを確認",
-                  path: "/",
-                },
-                {
-                  id: "8.1",
-                  title: "伝票一覧",
-                  desc: "購買・出庫に関する全伝票を横断的に検索・照会",
-                  path: "/production/slips",
-                },
-                {
-                  id: "8.2",
-                  title: "原材料・半製品購買",
-                  desc: "購買依頼から分納入庫・検収までの進行状況と履歴を管理",
-                  path: "/production/execution",
-                },
-                {
-                  id: "8.3",
-                  title: "出庫管理",
-                  desc: "製品の出庫依頼から売上確定までを管理",
-                  path: "/production/shipping",
-                },
-                {
-                  id: "8.4",
-                  title: "財務諸表",
-                  desc: "B/S、P/L照会およびPDF出力",
-                  path: "/documents/finance",
-                },
-                {
-                  id: "8.5",
-                  title: "BOM生産伝票",
-                  desc: "部品構成と必要数量をサンプルデータで確認",
-                  path: "/documents/bom",
-                },
-                {
-                  id: "8.6",
-                  title: "請求書・発注書",
-                  desc: "発注書（PO）、請求書（Invoice）照会およびPDF出力",
-                  path: "/documents/invoice",
-                },
-                {
-                  id: "8.7",
-                  title: "社員マスタ",
-                  desc: "社員の登録・修正・削除と職務区分の管理",
-                  path: "/master/employee",
-                },
-                {
-                  id: "8.8",
-                  title: "品目マスタ",
-                  desc: "原材料/半製品/完成品の登録・修正・削除",
-                  path: "/master/item",
-                },
-                {
-                  id: "8.9",
-                  title: "倉庫拠点マスタ",
-                  desc: "倉庫、拠点の登録・修正・削除",
-                  path: "/master/warehouse",
-                },
-              ].map((screen) => (
-                <div
-                  key={screen.id}
-                  onClick={() =>
-                    setNavigateTarget({
-                      title: screen.title,
-                      path: screen.path,
-                    })
-                  }
-                  className="flex items-start gap-3 p-3 rounded-lg border border-border/50 bg-secondary/30 hover:bg-primary/10 hover:border-primary/30 transition-colors cursor-pointer"
-                >
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] font-mono mt-0.5 flex-shrink-0"
-                  >
-                    {screen.id}
-                  </Badge>
-                  <div>
-                    <p className="text-xs font-semibold text-foreground">
-                      {screen.title}
-                      {["財務諸表", "BOM生産伝票", "請求書・発注書"].includes(
-                        screen.title,
-                      ) && (
-                        <Badge variant="outline" className="ml-2 text-[10px]">
-                          デモ表示
-                        </Badge>
-                      )}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">
-                      {screen.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+              今後の拡張として、C# ASP.NET Core Web API
+              と連携するための設計資料です。現在のデモ画面はこの API
+              には接続していません。
+            </p>
+            <ApiDesignDoc />
           </CardContent>
         </Card>
 
